@@ -6,6 +6,10 @@ import "protoc-gen-swagger/options/annotations.proto";
 
 package flipt;
 
+option java_multiple_files = true;
+option java_package = "io.markphelps.flipt";
+option java_outer_classname = "FliptGrpc";
+
 option go_package = "flipt";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {

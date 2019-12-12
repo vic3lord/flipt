@@ -1,0 +1,14 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+proto_library(
+    name = "flipt_proto",
+    srcs = ["flipt.proto"],
+    deps = ["@com_google_protobuf//:empty_proto", "@com_google_protobuf//:timestamp_proto", "@grpc_ecosystem_grpc_gateway//protoc-gen-swagger/options:options_proto"],
+)
+
+load("@rules_proto_grpc//java:defs.bzl", "java_grpc_compile")
+
+java_grpc_compile(
+    name = "flipt_grpc_java",
+    deps = ["flipt_proto"],
+)

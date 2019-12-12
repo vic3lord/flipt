@@ -4,18 +4,25 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.." || exit
 
+mkdir -p ../flipt-grpc-go
+mkdir -p ../flipt-grpc-ruby/lib
+mkdir -p ../flipt-grpc-java
+
 GO_OUTPUT_DIR=$(realpath "../flipt-grpc-go")
 RUBY_OUTPUT_DIR=$(realpath "../flipt-grpc-ruby/lib")
+JAVA_OUTPUT_DIR=$(realpath "../flipt-grpc-java")
 
-if [[ -f "grpc_tools_ruby_protoc" ]]; then
-    echo "--> installing ruby dependencies..."
-    gem install grpc-tools
-fi
+PROTO_DIR=$(realpath "rpc/")
+PROTO_FILE="${PROTO_DIR}/flipt.proto"
 
 echo "--> generating Go client to $GO_OUTPUT_DIR ..."
 
-protoc -I rpc/ rpc/flipt.proto --go_out=plugins=grpc:"$GO_OUTPUT_DIR"
+protoc -I "$PROTO_DIR" "$PROTO_FILE" --go_out=plugins=grpc:"$GO_OUTPUT_DIR"
 
 echo "--> generating Ruby client to $RUBY_OUTPUT_DIR ..."
 
-grpc_tools_ruby_protoc -I rpc/ --ruby_out="$RUBY_OUTPUT_DIR" --grpc_out="$RUBY_OUTPUT_DIR" rpc/flipt.proto
+grpc_tools_ruby_protoc -I "$PROTO_DIR" --ruby_out="$RUBY_OUTPUT_DIR" --grpc_out="$RUBY_OUTPUT_DIR" "$PROTO_FILE"
+
+echo "--> generating Java client to $JAVA_OUTPUT_DIR ..."
+
+protoc --plugin=/usr/local/bin/protoc-gen-grpc-java --grpc-java_out="$JAVA_OUTPUT_DIR" --proto_path="$PROTO_DIR" "$PROTO_FILE"
